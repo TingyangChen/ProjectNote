@@ -1,4 +1,4 @@
 # ProjectNote
 个人项目学习笔记
 
-[笔记链接](https://github.com/TingyangChen/ProjectNote/edit/edits/README.md)
+[笔记链接](https://github.com/TingyangChen/ProjectNote)
