@@ -1,0 +1,878 @@
+
+
+
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="复制">
+      
+        <meta name="lang:clipboard.copied" content="已复制">
+      
+        <meta name="lang:search.language" content="ja">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="没有找到符合条件的结果">
+      
+        <meta name="lang:search.result.one" content="找到 1 个符合条件的结果">
+      
+        <meta name="lang:search.result.other" content="# 个符合条件的结果">
+      
+        <meta name="lang:search.tokenizer" content="[\uff0c\u3002]+">
+      
+      <link rel="shortcut icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.4.0">
+    
+    
+      
+        <title>Using Geometry to Detect Grasp Poses in 3D Point Clouds - Yang笔记</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/application.0284f74d.css">
+      
+        <link rel="stylesheet" href="../../../assets/stylesheets/application-palette.01803549.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="">
+      
+    
+    
+      <script src="../../../assets/javascripts/modernizr.74668098.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../../../assets/fonts/material-icons.css">
+    
+    
+    
+      
+    
+    
+  </head>
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="blue-pink" data-md-color-accent="pink">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#using-geometry-to-detect-grasp-poses-in-3d-point-clouds" tabindex="1" class="md-skip">
+        跳转至
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="../../.." title="Yang笔记" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon"></i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              Yang笔记
+            </span>
+            <span class="md-header-nav__topic">
+              
+                Using Geometry to Detect Grasp Poses in 3D Point Clouds
+              
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            键入以开始搜索
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+        
+
+  
+
+<nav class="md-tabs md-tabs--active" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  <li class="md-tabs__item">
+    
+      <a href="../../.." title="总述" class="md-tabs__link">
+        总述
+      </a>
+    
+  </li>
+
+      
+        
+  
+  
+    <li class="md-tabs__item">
+      
+        <a href="../../../Projects/总述/" title="项目" class="md-tabs__link">
+          项目
+        </a>
+      
+    </li>
+  
+
+      
+        
+  
+  
+    <li class="md-tabs__item">
+      
+        <a href="../0/" title="文献-深度学习抓取" class="md-tabs__link md-tabs__link--active">
+          文献-深度学习抓取
+        </a>
+      
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="../../.." title="Yang笔记" class="md-nav__button md-logo">
+      
+        <i class="md-icon"></i>
+      
+    </a>
+    Yang笔记
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../.." title="总述" class="md-nav__link">
+      总述
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
+    
+    <label class="md-nav__link" for="nav-2">
+      项目
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-2">
+        项目
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../Projects/总述/" title="项目总述" class="md-nav__link">
+      项目总述
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../../Projects/激光扫描3D重建及打磨/3D重建/" title="LMI激光扫描3D重建及打磨" class="md-nav__link">
+      LMI激光扫描3D重建及打磨
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" checked>
+    
+    <label class="md-nav__link" for="nav-3">
+      文献-深度学习抓取
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        文献-深度学习抓取
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../0/" title="文献总述" class="md-nav__link">
+      文献总述
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../1/" title="基于视觉的机器人抓取系统采用深度学习检测3D物体的位姿" class="md-nav__link">
+      基于视觉的机器人抓取系统采用深度学习检测3D物体的位姿
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../2/" title="Deep Learning for Detecting Robotic Grasps" class="md-nav__link">
+      Deep Learning for Detecting Robotic Grasps
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Using Geometry to Detect Grasp Poses in 3D Point Clouds
+      </label>
+    
+    <a href="./" title="Using Geometry to Detect Grasp Poses in 3D Point Clouds" class="md-nav__link md-nav__link--active">
+      Using Geometry to Detect Grasp Poses in 3D Point Clouds
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">目录</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" title="1）摘要" class="md-nav__link">
+    1）摘要
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2introduction" title="2）Introduction" class="md-nav__link">
+    2）Introduction
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3related-work" title="3）Related Work" class="md-nav__link">
+    3）Related Work
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4approach" title="4）Approach" class="md-nav__link">
+    4）Approach
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5sampling-hands-hand-hypotheses" title="5）采样抓取姿态Sampling Hands （生成hand hypotheses）" class="md-nav__link">
+    5）采样抓取姿态Sampling Hands （生成hand hypotheses）
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#geometry-of-the-hand-and-the-object-surface" title="Geometry of the Hand and the Object Surface" class="md-nav__link">
+    Geometry of the Hand and the Object Surface
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hand-sample-set" title="Hand Sample Set" class="md-nav__link">
+    Hand Sample Set
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6classifying-hand-hypotheses" title="6）Classifying Hand Hypotheses" class="md-nav__link">
+    6）Classifying Hand Hypotheses
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#labeling-grasp-hypotheses" title="Labeling Grasp Hypotheses" class="md-nav__link">
+    Labeling Grasp Hypotheses
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#feature-representation" title="Feature Representation" class="md-nav__link">
+    Feature Representation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#creating-the-training-set" title="Creating the training set" class="md-nav__link">
+    Creating the training set
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7robot-experiment" title="7）Robot Experiment" class="md-nav__link">
+    7）Robot Experiment
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#grasp-selection" title="Grasp Selection" class="md-nav__link">
+    Grasp Selection
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" title="单个对像抓取实验" class="md-nav__link">
+    单个对像抓取实验
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" title="多个对像抓取实验" class="md-nav__link">
+    多个对像抓取实验
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../SegICP/" title="SegICP-Integrated Deep Semantic Segmentation and Pose Estimation" class="md-nav__link">
+      SegICP-Integrated Deep Semantic Segmentation and Pose Estimation
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">目录</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" title="1）摘要" class="md-nav__link">
+    1）摘要
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2introduction" title="2）Introduction" class="md-nav__link">
+    2）Introduction
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3related-work" title="3）Related Work" class="md-nav__link">
+    3）Related Work
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4approach" title="4）Approach" class="md-nav__link">
+    4）Approach
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5sampling-hands-hand-hypotheses" title="5）采样抓取姿态Sampling Hands （生成hand hypotheses）" class="md-nav__link">
+    5）采样抓取姿态Sampling Hands （生成hand hypotheses）
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#geometry-of-the-hand-and-the-object-surface" title="Geometry of the Hand and the Object Surface" class="md-nav__link">
+    Geometry of the Hand and the Object Surface
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hand-sample-set" title="Hand Sample Set" class="md-nav__link">
+    Hand Sample Set
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6classifying-hand-hypotheses" title="6）Classifying Hand Hypotheses" class="md-nav__link">
+    6）Classifying Hand Hypotheses
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#labeling-grasp-hypotheses" title="Labeling Grasp Hypotheses" class="md-nav__link">
+    Labeling Grasp Hypotheses
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#feature-representation" title="Feature Representation" class="md-nav__link">
+    Feature Representation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#creating-the-training-set" title="Creating the training set" class="md-nav__link">
+    Creating the training set
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7robot-experiment" title="7）Robot Experiment" class="md-nav__link">
+    7）Robot Experiment
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#grasp-selection" title="Grasp Selection" class="md-nav__link">
+    Grasp Selection
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" title="单个对像抓取实验" class="md-nav__link">
+    单个对像抓取实验
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" title="多个对像抓取实验" class="md-nav__link">
+    多个对像抓取实验
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+<h1 id="using-geometry-to-detect-grasp-poses-in-3d-point-clouds"><div id="3.md">Using Geometry to Detect Grasp Poses in 3D Point Clouds</div><a class="headerlink" href="#using-geometry-to-detect-grasp-poses-in-3d-point-clouds" title="Permanent link">&para;</a></h1>
+<ul>
+<li>2015 美国东北大学 计算机信息科学学院 Boston，Massachusetts，USA</li>
+<li>该实验室<a href="https://www2.ccs.neu.edu/research/helpinghands/">(Helping Hands Lab)</a>又发表了几篇抓取的论文，<a href="http://www.ccs.neu.edu/home/atp/">作者Andreas ten Pas的个人网站</a></li>
+</ul>
+<h2 id="1">1）摘要<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
+<ol>
+<li>
+<p>论文提出了机器学习方法在杂乱场景中检测新物体的抓取位姿，算法的输入是物体的点云和机器人的几何参数，算法的输出是一系列的可以实现抓取的位姿。</p>
+</li>
+<li>
+<p>贡献点：</p>
+<p>（1）对一个抓取位姿定义了一系列的必要的几何限定条件 <strong>(geometric grasp conditions)</strong> ，这些限定条件可用于生成一系列的候选抓取位姿 <strong>(grasp hypotheses)</strong>，这使我们的关注点集中在可生成抓取位姿的区域。</p>
+<p>（2）阐述了如何使用geometric grasp conditions用于生成用于训练机器学习算法的标记数据集。</p>
+<p>（3）论文中提出的算法在单个物体场景下取得88%的平均成功率，在杂乱背景下取得73%的平均成功率。
+3. 论文代码已经做成了ROS功能包，链接：<a href="http://wiki.ros.org/agile_grasp">http://wiki.ros.org/agile_grasp</a></p>
+</li>
+</ol>
+<h2 id="2introduction">2）Introduction<a class="headerlink" href="#2introduction" title="Permanent link">&para;</a></h2>
+<p>作者把机器人抓取分成两步，传统地分成perception和planning。Perception是估计被抓取对象的位置和姿态，之后才是规划路径和控制机器人实现抓取。<strong>难点就在于如何估计抓取对象的位姿。</strong></p>
+<p>研究者已经提出了多种抓取点检测方法。其中一类是从RGBD数据中使用滑窗法（sliding window）检测抓取区域，另一些方法采用人工定义的抓取位姿描述（grasp prototypes）</p>
+<p>以上所说两种方法没有关注grasp geometry，点云数据可以帮助研究grasp geometry。本论文中算法通过预测当前场景下存在所需且足够的几何条件从而生成抓取位姿。</p>
+<ul>
+<li>
+<p>算法分成两步:</p>
+<p>（1）生成大量的后候选抓取位姿（grasp hypothesis）。首先用几何信息减少采样区域，作者提出了一个采样方法生成grasp hypotheses, 同时满足机器手与抓取对像之间不发生碰撞和机械手抓必须覆盖在对像的表面。第二步算法使用几何信息自动地标记训练数据集。</p>
+<p>（2）对生成的候选抓取位姿进行分类</p>
+</li>
+</ul>
+<p>实验显示论文中提出的算法在不使用机器学习算法的情况下抓取新对像可以获得73%的成功率。使用机器学习分类之后成功率上升到88%。 且论文提出的算法在非常杂乱的场景下仍可取得73%的平均成功率。</p>
+<h2 id="3related-work">3）Related Work<a class="headerlink" href="#3related-work" title="Permanent link">&para;</a></h2>
+<p>抓取点识别方法，最开始在RGBD图像中使用sliding window识别抓取区域，之后研究者在这基础上扩展该方法实现抓取，并取得一定的抓取成功率。别的一些方法是基于点云数据（point cloud）或者RGB数据，<strong>不想仔细看了</strong></p>
+<h2 id="4approach">4）Approach<a class="headerlink" href="#4approach" title="Permanent link">&para;</a></h2>
+<ul>
+<li>定义1：Antipodoal: </li>
+</ul>
+<p><a name="定义2"></p>
+<ul>
+<li>定义2：Antipodoal Hand:二平行手指的姿态，姿态的接触点使二指闭合时力的方向沿着两接触点的连线上
+</a></li>
+</ul>
+<p>算法的可表示为：
+<img alt="论文算法公式表示" src="../Image/3.1.png" /></p>
+<h2 id="5sampling-hands-hand-hypotheses">5）采样抓取姿态Sampling Hands （生成hand hypotheses）<a class="headerlink" href="#5sampling-hands-hand-hypotheses" title="Permanent link">&para;</a></h2>
+<h3 id="geometry-of-the-hand-and-the-object-surface">Geometry of the Hand and the Object Surface<a class="headerlink" href="#geometry-of-the-hand-and-the-object-surface" title="Permanent link">&para;</a></h3>
+<p>机械手爪的参数通过参数向量<span><span class="MathJax_Preview">\theta = (\theta_l, \theta_w, \theta_d, \theta_t)</span><script type="math/tex">\theta = (\theta_l, \theta_w, \theta_d, \theta_t)</script></span>来描述，<span><span class="MathJax_Preview">\theta_t</span><script type="math/tex">\theta_t</script></span>表示手指的厚度，如何下图所示：</p>
+<p><img alt="手指参数定义" src="../Image/3.2.png" /></p>
+<p><strong>论文中定义好多公式看不懂，还引用了一些方法进行拟合</strong></p>
+<h3 id="hand-sample-set">Hand Sample Set<a class="headerlink" href="#hand-sample-set" title="Permanent link">&para;</a></h3>
+<p>生成一个数据集<span><span class="MathJax_Preview">H</span><script type="math/tex">H</script></span>，该数据集包含许多antipodal hands<span><span class="MathJax_Preview">(h\in H)</span><script type="math/tex">(h\in H)</script></span>, 首先要定义3个限制条件</p>
+<ol>
+<li>机械手爪与点云之间没有碰撞</li>
+<li>手爪闭合平面(hand closing plane)包含p: <span><span class="MathJax_Preview">p\in C(h)</span><script type="math/tex">p\in C(h)</script></span></li>
+<li>手爪的闭合平面和物体点云的切平面(cutting plane)平行</li>
+</ol>
+<p>算法描述：需要用的时候再返回来仔细看</p>
+<p><img alt="算法描述" src="../Image/3.3.png" /></p>
+<h2 id="6classifying-hand-hypotheses">6）Classifying Hand Hypotheses<a class="headerlink" href="#6classifying-hand-hypotheses" title="Permanent link">&para;</a></h2>
+<p>在步骤5）中生成了hand hypotheses，在这一步根据其是否为antipodal hand对它进行分类。最简单的方法是参考对像表面的点云数据来检测hand hypotheses是否满足<a href="#定义2">姿态的接触点使二指闭合时力的方向沿着两接触点的连线上</a>， <strong>但是很多真实的点云数据只能看到对像的部分</strong>，按照4）定义2的要求来检测hand hypotheses，则很大部分不满足要求。为了解决这个问题，论文中将采用机器学习算法进行分类。</p>
+<h3 id="labeling-grasp-hypotheses">Labeling Grasp Hypotheses<a class="headerlink" href="#labeling-grasp-hypotheses" title="Permanent link">&para;</a></h3>
+<p>许多抓取点检测算法需要大量人工标记好抓取点的数据集，这个工作需要很大的人力且不讨好，因为人很难确定在任一个场景下对机器人来说哪些点是最好的抓取点。Instead，论文中的算法根据<a href="#定义2">4)定义2</a>可从训练集图中自动生成标记。</p>
+<ul>
+<li>定义3：定义了阈值条件<span><span class="MathJax_Preview">k\in N</span><script type="math/tex">k\in N</script></span>and<span><span class="MathJax_Preview">\theta\in[0, pi/2]</span><script type="math/tex">\theta\in[0, pi/2]</script></span>,在条件内的hand hypotheses是near hypotheses</li>
+</ul>
+<p><em>论文中的定义的符号太难懂</em></p>
+<h3 id="feature-representation">Feature Representation<a class="headerlink" href="#feature-representation" title="Permanent link">&para;</a></h3>
+<p>为了训练SVM模型，需要用一个Feature Descriptor来描述Hand的特征，论文中选择使用HOG特征描述子，<strong>具体的没看懂</strong></p>
+<h3 id="creating-the-training-set">Creating the training set<a class="headerlink" href="#creating-the-training-set" title="Permanent link">&para;</a></h3>
+<p>根据HOG特征生成训练集，也是分成了好几步，看图</p>
+<p><img alt="生成hand" src="../Image/3.5.png" /></p>
+<h2 id="7robot-experiment">7）Robot Experiment<a class="headerlink" href="#7robot-experiment" title="Permanent link">&para;</a></h2>
+<ul>
+<li>使用的机器人：Baxter robot from Rethink Robotics</li>
+<li>手爪：Baxter gripper，闭合时间距3cm，张开时间距7cm，也就是说该手爪只能抓取大小在3-7cm之间的物体。</li>
+<li>Computer：intel i7 3.5GHz with 16GB内存</li>
+<li>深度传感器：Asus Xtion Pro range sensors</li>
+<li>采样4000hand hypotheses，实现在线检测和选择最终执行的hand的过程需要2.7s；训练SVM模型需要5分钟</li>
+<li>算法采用C++写的，只要有Baxter和合适的range sensor就可以复现论文中的内容，<a href="http://wiki.ros.org/agile_grasp">详情参考ROS功能包</a></li>
+</ul>
+<h3 id="grasp-selection">Grasp Selection<a class="headerlink" href="#grasp-selection" title="Permanent link">&para;</a></h3>
+<p>当算法生成了几百上千个antipodal hand，最后需要选出最好的一个进行执行抓取任务，一种方式是选择最感兴趣的物体的hand，或者选择最好抓取的一个hand。</p>
+<p>第一，根据distance和orientation把antipodal hand进行聚类。在每个新的group中计算类的均值和方向的均值作为新生成的hand</p>
+<p>第二，根据机器人最容易的姿态，从新生成的hand中选择机器人觉得最舒适的抓取姿态所对应的hand</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="codehilite"><pre><span></span>(1)对每一个hand的位置先计算对应的机器人逆运动学，去掉无解所对应的hand.
+(2)剩下的hand根据3个标准再继续分等级：joint limit，hand joint limit,  **没看懂**
+</pre></div>
+</td></tr></table>
+
+<h3 id="_1">单个对像抓取实验<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<p>实验对比了在无SVM分类的情况下1只眼和2两只眼的trial成功率与在有SVM分类的情况下1只眼和2只眼trial成功率。</p>
+<p><img alt="实验结果统计表" src="../Image/3.4.png" /></p>
+<h3 id="_2">多个对像抓取实验<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>使用与抓取单个对像同样的算法（有SVM和2只眼），在杂乱的背景下可实现平均85%的成功率。</p>
+<p><a href="../2/#页间跳转">跳转到Deep Learning for Detecting Robotic Grasps</a></p>
+                
+                  
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../2/" title="Deep Learning for Detecting Robotic Grasps" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  上一页
+                </span>
+                Deep Learning for Detecting Robotic Grasps
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../SegICP/" title="SegICP-Integrated Deep Semantic Segmentation and Pose Estimation" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  下一页
+                </span>
+                SegICP-Integrated Deep Semantic Segmentation and Pose Estimation
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../assets/javascripts/application.245445c6.js"></script>
+      
+        
+        
+          
+          <script src="../../../assets/javascripts/lunr/lunr.stemmer.support.js"></script>
+          
+            
+              
+                <script src="../../../assets/javascripts/lunr/tinyseg.js"></script>
+              
+              
+                <script src="../../../assets/javascripts/lunr/lunr.ja.js"></script>
+              
+            
+          
+          
+        
+      
+      <script>app.initialize({version:"1.0.4",url:{base:"../../.."}})</script>
+      
+        <script src="../../../js/extra.js"></script>
+      
+        <script src="../../../js/baidu-tongji.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+      
+    
+  </body>
+</html>
